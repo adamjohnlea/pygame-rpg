@@ -72,8 +72,8 @@ class Game:
                 if self.rooms['shop'].shop.handle_input(event, self.player):
                     # If item was bought, check quest objectives
                     self.quest_manager.check_purchase_objectives(None)
-                    # Apply quest rewards if completed
-                    self.apply_quest_rewards()
+                    # Don't apply rewards immediately - they'll be applied in update()
+                    # self.apply_quest_rewards()  # Removed from here
 
             self.player.handle_input(event)
 
@@ -82,9 +82,12 @@ class Game:
     def apply_quest_rewards(self):
         for quest in self.quest_manager.get_active_quests():
             if quest.is_completed() and quest.status != 'rewarded':
+                print(f"Applying rewards for quest: {quest.name}")  # Debug print
                 # Apply rewards
                 if 'gold' in quest.rewards:
-                    self.player.stats['gold'] += quest.rewards['gold']
+                    reward_gold = quest.rewards['gold']
+                    print(f"Adding {reward_gold} gold as quest reward")  # Debug print
+                    self.player.stats['gold'] += reward_gold
                 if 'items' in quest.rewards:
                     for item in quest.rewards['items']:
                         for _ in range(item.get('quantity', 1)):
@@ -93,6 +96,7 @@ class Game:
                     for stat, value in quest.rewards['stats'].items():
                         self.player.stats[stat] += value
                 quest.status = 'rewarded'
+                print(f"Quest {quest.name} marked as rewarded")
 
     def update(self):
         if not self.game_state.is_menu_active() and not self.game_state.is_shop_active():
