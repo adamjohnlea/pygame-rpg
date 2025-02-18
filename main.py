@@ -8,6 +8,7 @@ from game.room import Room
 from game.quest import QuestManager
 from game.quest_ui import QuestUI
 from game.hud import HUD
+from game.combat import Combat
 
 class Game:
     def __init__(self):
@@ -22,6 +23,7 @@ class Game:
         self.menu = Menu(self.screen)
         self.hud = HUD()
         self.quest_ui = QuestUI()
+        self.combat = None
         print("Game components initialized")
         self.reset_game()
 
@@ -51,12 +53,16 @@ class Game:
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    self.game_state.toggle_menu()
-                if event.key == pygame.K_i:
+                    if self.game_state.is_combat_active():
+                        self.game_state.toggle_combat()
+                        self.combat = None
+                    else:
+                        self.game_state.toggle_menu()
+                if event.key == pygame.K_i and not self.game_state.is_combat_active():
                     self.game_state.toggle_inventory()
-                if event.key == pygame.K_q:
+                if event.key == pygame.K_q and not self.game_state.is_combat_active():
                     self.game_state.toggle_quest_log()
-                if event.key == pygame.K_j:  # Available quests
+                if event.key == pygame.K_j and not self.game_state.is_combat_active():
                     available_quests = self.quest_manager.get_available_quests()
                     if available_quests:
                         self.game_state.toggle_available_quests()
@@ -64,12 +70,54 @@ class Game:
                         self.quest_ui.show_notification("No quests available!\nComplete current quests to unlock more.")
                 if event.key == pygame.K_r:
                     self.reset_game()
-                if event.key == pygame.K_e and self.current_room == 'shop':
-                    current_room = self.rooms[self.current_room]
-                    if current_room.can_interact_with_shop(self.player):
-                        self.game_state.toggle_shop()
+                if event.key == pygame.K_e:
+                    if self.current_room == 'shop':
+                        current_room = self.rooms[self.current_room]
+                        if current_room.can_interact_with_shop(self.player):
+                            self.game_state.toggle_shop()
+                    elif self.current_room == 'dungeon':
+                        current_room = self.rooms[self.current_room]
+                        if current_room.can_interact_with_enemy(self.player):
+                            self.start_combat(current_room.enemy)
 
-            # Handle available quests input
+            # Handle inventory input when inventory is active
+            if self.game_state.is_inventory_active():
+                success, message = self.player.inventory.handle_input(event, self.player)
+                if message:  # Show message if item was used or there was an error
+                    self.quest_ui.show_notification(message)
+                if success:  # Close inventory if item was used successfully
+                    self.game_state.toggle_inventory()
+
+            # Handle combat input
+            if self.game_state.is_combat_active() and self.combat:
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                    if self.combat.turn == 'player':
+                        self.combat.player_attack()
+                        # Check if combat is over after player attacks
+                        result = self.combat.is_combat_over()
+                        if result:
+                            if result == 'player':
+                                self.quest_ui.show_notification("Victory!")
+                                self.rooms[self.current_room].enemy_active = False
+                            else:
+                                self.quest_ui.show_notification("Defeat!")
+                            self.game_state.toggle_combat()
+                            self.combat = None
+                        else:
+                            # Enemy attacks after a brief delay
+                            self.combat.enemy_attack()
+                            # Check if combat is over after enemy attacks
+                            result = self.combat.is_combat_over()
+                            if result:
+                                if result == 'player':
+                                    self.quest_ui.show_notification("Victory!")
+                                    self.rooms[self.current_room].enemy_active = False
+                                else:
+                                    self.quest_ui.show_notification("Defeat!")
+                                self.game_state.toggle_combat()
+                                self.combat = None
+
+            # Handle other inputs...
             if self.game_state.is_available_quests_active():
                 selected_quest = self.quest_ui.handle_input(event, self.quest_manager.get_available_quests())
                 if selected_quest:
@@ -77,17 +125,23 @@ class Game:
                         self.quest_ui.show_notification(f"Accepted Quest: {selected_quest.name}")
                         self.game_state.toggle_available_quests()
 
-            # Handle shop input when shop is active
             if self.game_state.is_shop_active() and self.current_room == 'shop':
                 success, message = self.rooms['shop'].shop.handle_input(event, self.player)
                 if success:
                     self.quest_manager.check_purchase_objectives(None)
-                elif message:  # If there's a message (like insufficient gold)
+                elif message:
                     self.quest_ui.show_notification(message)
 
-            self.player.handle_input(event)
+            if not self.game_state.is_combat_active():
+                self.player.handle_input(event)
 
         return True
+
+    def start_combat(self, enemy):
+        """Initialize combat with an enemy."""
+        self.combat = Combat(self.player, enemy)
+        self.game_state.toggle_combat()
+        self.quest_ui.show_notification("Combat started! Press SPACE to attack.")
 
     def update(self):
         if not self.game_state.is_menu_active() and not self.game_state.is_shop_active():
@@ -124,13 +178,19 @@ class Game:
 
     def render(self):
         self.screen.fill((0, 0, 0))
-        self.rooms[self.current_room].render(self.screen)
         
-        if not self.game_state.is_shop_active():
-            self.player.render(self.screen)
+        # Only render room and player if not in combat
+        if not self.game_state.is_combat_active():
+            self.rooms[self.current_room].render(self.screen)
+            if not self.game_state.is_shop_active():
+                self.player.render(self.screen)
 
         self.hud.update(self.player.stats)
         self.hud.render(self.screen, self.player.stats, self.current_room)
+
+        # Render combat if active
+        if self.game_state.is_combat_active() and self.combat:
+            self.combat.render(self.screen)
 
         if self.game_state.is_menu_active():
             self.menu.render()
