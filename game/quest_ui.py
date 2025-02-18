@@ -77,7 +77,7 @@ class QuestUI:
         quest_surface.blit(title, (20, 20))
 
         # Instructions
-        instructions = self.small_font.render("Use ↑↓ to select, ENTER to accept", True, (200, 200, 200))
+        instructions = self.small_font.render("Use UP/DOWN to select, ENTER to accept", True, (200, 200, 200))
         quest_surface.blit(instructions, (20, 45))
 
         # Render each quest
