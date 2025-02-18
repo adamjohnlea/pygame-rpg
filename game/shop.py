@@ -17,12 +17,13 @@ class Shop:
             elif event.key == pygame.K_DOWN:
                 self.selected_item = (self.selected_item + 1) % len(self.items)
             elif event.key == pygame.K_RETURN:
-                return self.buy_item(player, self.selected_item)
-        return False
+                success, message = self.buy_item(player, self.selected_item)
+                return success, message
+        return False, None
 
     def buy_item(self, player, item_index):
         if item_index < 0 or item_index >= len(self.items):
-            return False
+            return False, None
 
         item = self.items[item_index]
         print(f"Attempting to buy {item['name']} for {item['price']} gold. Current gold: {player.stats['gold']}")
@@ -41,8 +42,9 @@ class Shop:
             }
             print(f"Adding item to inventory: {inventory_item}")
             player.inventory.add_item(inventory_item)
-            return True
-        return False
+            return True, None
+        else:
+            return False, f"Not enough gold!\nRequired: {item['price']}\nYou have: {player.stats['gold']}"
 
     def render(self, screen):
         # Draw shop background
