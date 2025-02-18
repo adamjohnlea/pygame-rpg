@@ -5,7 +5,8 @@ class HUD:
     def __init__(self):
         self.animated_health = 100
         self.animated_gold = 100
-        self.animation_speed = 0.1
+        self.health_animation_speed = 0.1  # Keep health animation slower
+        self.gold_animation_speed = 0.5    # Make gold animation faster
         self.header_height = 40
         self.font = pygame.font.Font(None, 28)
         # Gold coin colors
@@ -29,13 +30,16 @@ class HUD:
         target_health = player_stats['health']
         if self.animated_health != target_health:
             diff = target_health - self.animated_health
-            self.animated_health += diff * self.animation_speed
+            self.animated_health += diff * self.health_animation_speed
 
         # Smoothly animate gold changes
         target_gold = player_stats['gold']
         if self.animated_gold != target_gold:
             diff = target_gold - self.animated_gold
-            self.animated_gold += diff * self.animation_speed
+            self.animated_gold += diff * self.gold_animation_speed
+            # If we're very close to target, just snap to it
+            if abs(self.animated_gold - target_gold) < 1:
+                self.animated_gold = target_gold
 
     def render(self, screen, player_stats, current_room):
         # Create a semi-transparent surface for the header bar
