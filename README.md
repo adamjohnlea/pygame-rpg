@@ -29,8 +29,9 @@ cd simple-rpg</code></pre>
     </li>
     <li>Activate the virtual environment:
         <pre><code># On macOS/Linux:
-source venv/bin/activate<br>
-On Windows:
+source venv/bin/activate
+
+# On Windows:
 .\venv\Scripts\activate</code></pre>
     </li>
     <li>Install dependencies:
@@ -46,19 +47,41 @@ On Windows:
     </li>
 </ol>
 
-<h2>Controls</h2>
+<h2>Game Controls</h2>
+
+<h3>Movement</h3>
 <table>
     <tr>
         <th>Key</th>
         <th>Action</th>
     </tr>
     <tr>
-        <td>W/A/S/D</td>
-        <td>Move player</td>
+        <td>W</td>
+        <td>Move up</td>
+    </tr>
+    <tr>
+        <td>A</td>
+        <td>Move left</td>
+    </tr>
+    <tr>
+        <td>S</td>
+        <td>Move down</td>
+    </tr>
+    <tr>
+        <td>D</td>
+        <td>Move right</td>
+    </tr>
+</table>
+
+<h3>Menu and Interface</h3>
+<table>
+    <tr>
+        <th>Key</th>
+        <th>Action</th>
     </tr>
     <tr>
         <td>ESC</td>
-        <td>Toggle menu</td>
+        <td>Toggle main menu</td>
     </tr>
     <tr>
         <td>I</td>
@@ -69,14 +92,59 @@ On Windows:
         <td>Toggle quest log</td>
     </tr>
     <tr>
-        <td>E</td>
-        <td>Interact with shop (when in shop room)</td>
+        <td>J</td>
+        <td>View available quests</td>
     </tr>
     <tr>
         <td>R</td>
         <td>Reset game</td>
     </tr>
 </table>
+
+<h3>Interaction</h3>
+<table>
+    <tr>
+        <th>Key</th>
+        <th>Action</th>
+    </tr>
+    <tr>
+        <td>E</td>
+        <td>Interact with shop (when near shop counter)</td>
+    </tr>
+    <tr>
+        <td>ENTER</td>
+        <td>Accept quest (in available quests menu) or Buy item (in shop)</td>
+    </tr>
+</table>
+
+<h3>Shop Navigation</h3>
+<table>
+    <tr>
+        <th>Key</th>
+        <th>Action</th>
+    </tr>
+    <tr>
+        <td>↑</td>
+        <td>Select previous item</td>
+    </tr>
+    <tr>
+        <td>↓</td>
+        <td>Select next item</td>
+    </tr>
+    <tr>
+        <td>ENTER</td>
+        <td>Buy selected item</td>
+    </tr>
+</table>
+
+<h3>Room Navigation</h3>
+<p>Walk to the edges of rooms to transition between:</p>
+<ul>
+    <li>Town → Shop (right exit)</li>
+    <li>Town → Dungeon (left exit)</li>
+    <li>Shop → Town (left exit)</li>
+    <li>Dungeon → Town (right exit)</li>
+</ul>
 
 <h2>Project Structure</h2>
 <pre>
