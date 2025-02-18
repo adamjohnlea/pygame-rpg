@@ -27,4 +27,7 @@ class Menu:
             text = font.render(option, True, color)
             menu_surface.blit(text, (20, 50 + i * 50))
 
-        self.screen.blit(menu_surface, (250, 100))
+        # Center the menu on screen (1280x1024)
+        menu_x = (1280 - menu_surface.get_width()) // 2
+        menu_y = (1024 - menu_surface.get_height()) // 2
+        self.screen.blit(menu_surface, (menu_x, menu_y))

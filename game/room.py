@@ -8,45 +8,47 @@ class Room:
         self.spawn_points = self.setup_spawn_points()
         self.objects = []
         self.shop = None
-        self.interaction_area = pygame.Rect(300, 200, 200, 100)
+        # Center the shop interaction area horizontally (1280/2 - width/2)
+        self.interaction_area = pygame.Rect(490, 412, 300, 200)
         if room_type == 'shop':
             from .shop import Shop
             self.shop = Shop()
 
     def setup_exits(self):
+        """Setup exit rectangles for each room. Exits are 80 pixels wide and 160 pixels tall."""
         if self.room_type == 'town':
             return {
-                'shop': pygame.Rect(750, 250, 50, 100),    # Right exit to shop
-                'dungeon': pygame.Rect(0, 250, 50, 100)    # Left exit to dungeon
+                'shop': pygame.Rect(self.width - 80, 432, 80, 160),    # Right exit to shop
+                'dungeon': pygame.Rect(0, 432, 80, 160)                 # Left exit to dungeon
             }
         elif self.room_type == 'shop':
             return {
-                'town': pygame.Rect(0, 250, 50, 100)      # Left exit to town
+                'town': pygame.Rect(0, 432, 80, 160)                    # Left exit to town
             }
         elif self.room_type == 'dungeon':
             return {
-                'town': pygame.Rect(750, 250, 50, 100)    # Right exit to town
+                'town': pygame.Rect(self.width - 80, 432, 80, 160)     # Right exit to town
             }
         return {}
 
     def setup_spawn_points(self):
         """
         Setup spawn points for room transitions.
-        When player exits through right side (x=750), they should spawn on left side (x=100) of new room
-        When player exits through left side (x=0), they should spawn on right side (x=700) of new room
+        Spawn points are positioned just inside the opposite side of where the player entered,
+        and at the same height as the exit's center (432 + 160/2 = 512).
         """
         if self.room_type == 'town':
             return {
-                'shop': (700, 300),    # From shop's left exit, spawn on right
-                'dungeon': (100, 300)  # From dungeon's right exit, spawn on left
+                'shop': (self.width - 120, 512),    # From shop (left exit), spawn near right
+                'dungeon': (120, 512)               # From dungeon (right exit), spawn near left
             }
         elif self.room_type == 'shop':
             return {
-                'town': (100, 300)     # From town's right exit, spawn on left
+                'town': (120, 512)                  # From town (right exit), spawn near left
             }
         elif self.room_type == 'dungeon':
             return {
-                'town': (700, 300)     # From town's left exit, spawn on right
+                'town': (self.width - 120, 512)     # From town (left exit), spawn near right
             }
         return {}
 
@@ -63,7 +65,7 @@ class Room:
 
     def get_spawn_position(self, previous_room):
         """Get the spawn position when entering from a specific room"""
-        spawn_pos = self.spawn_points.get(previous_room, (400, 300))
+        spawn_pos = self.spawn_points.get(previous_room, (self.width // 2, self.height // 2))
         print(f"Spawning in {self.room_type} from {previous_room} at position: {spawn_pos}")
         return spawn_pos
 

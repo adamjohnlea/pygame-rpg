@@ -7,12 +7,12 @@ class HUD:
         self.animated_gold = 100
         self.health_animation_speed = 0.1  # Keep health animation slower
         self.gold_animation_speed = 0.5    # Make gold animation faster
-        self.header_height = 40
-        self.font = pygame.font.Font(None, 28)
+        self.header_height = 50  # Slightly taller header for 1080p
+        self.font = pygame.font.Font(None, 32)  # Larger font for 1080p
         # Gold coin colors
         self.coin_color = (255, 215, 0)  # Golden yellow
         self.coin_border = (218, 165, 32)  # Darker gold
-        self.coin_radius = 8
+        self.coin_radius = 10  # Slightly larger coin for 1080p
 
     def draw_gold_coin(self, screen, x, y):
         # Draw the main coin circle
@@ -43,7 +43,7 @@ class HUD:
 
     def render(self, screen, player_stats, current_room):
         # Create a semi-transparent surface for the header bar
-        header_surface = pygame.Surface((800, self.header_height))
+        header_surface = pygame.Surface((1280, self.header_height))
         header_surface.fill((20, 22, 24))
         header_surface.set_alpha(230)
 
@@ -51,8 +51,8 @@ class HUD:
         screen.blit(header_surface, (0, 0))
 
         # Draw health bar background
-        health_bar_width = 150
-        pygame.draw.rect(screen, (40, 40, 40), (10, 10, health_bar_width, 20))
+        health_bar_width = 300  # Wider health bar for 1080p
+        pygame.draw.rect(screen, (40, 40, 40), (20, 15, health_bar_width, 25))
 
         # Calculate health percentage and color
         health_percent = self.animated_health / player_stats['max_health']
@@ -66,21 +66,21 @@ class HUD:
         )
 
         # Draw animated health bar
-        pygame.draw.rect(screen, health_color, (10, 10, health_width, 20))
+        pygame.draw.rect(screen, health_color, (20, 15, health_width, 25))
         
         # Draw health text
         health_text = self.font.render(
             f"{int(self.animated_health)}/{player_stats['max_health']} HP", 
             True, (255, 255, 255)
         )
-        screen.blit(health_text, (170, 10))
+        screen.blit(health_text, (330, 15))
 
         # Draw custom gold coin and amount
-        self.draw_gold_coin(screen, 350, 20)  # Draw coin at y=20 to center it vertically
+        self.draw_gold_coin(screen, 650, 25)  # Adjusted position for 1080p
         gold_text = self.font.render(
             str(int(self.animated_gold)), True, self.coin_color
         )
-        screen.blit(gold_text, (365, 10))  # Adjusted x position to account for coin
+        screen.blit(gold_text, (670, 15))  # Adjusted position for 1080p
 
         # Draw room name with a background highlight
         room_text = self.font.render(current_room.capitalize(), True, (200, 200, 255))
@@ -88,6 +88,6 @@ class HUD:
         
         # Draw a subtle background for the room name
         pygame.draw.rect(screen, (40, 44, 52), 
-                        (600, 5, text_width + 20, 30), 
+                        (960, 10, text_width + 20, 35),  # Adjusted for 1280x1024
                         border_radius=5)
-        screen.blit(room_text, (610, 10))
+        screen.blit(room_text, (970, 15))  # Adjusted for 1280x1024

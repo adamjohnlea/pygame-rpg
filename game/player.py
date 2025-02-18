@@ -52,9 +52,13 @@ class Player:
         self.rect.x = self.x
         self.rect.y = self.y
 
-        # Keep player in bounds
-        self.x = max(0, min(self.x, 800 - self.width))
-        self.y = max(0, min(self.y, 600 - self.height))
+        # Keep player in bounds for 1280x1024 resolution
+        self.x = max(0, min(self.x, 1280 - self.width))
+        self.y = max(0, min(self.y, 1024 - self.height))
+        
+        # Update rectangle position to match actual position
+        self.rect.x = self.x
+        self.rect.y = self.y
 
     def update(self):
         keys = pygame.key.get_pressed()

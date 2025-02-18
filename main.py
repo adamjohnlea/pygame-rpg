@@ -12,7 +12,7 @@ from game.hud import HUD
 class Game:
     def __init__(self):
         print("Initializing game...")
-        self.screen = pygame.display.set_mode((800, 600))
+        self.screen = pygame.display.set_mode((1280, 1024))
         pygame.display.set_caption("Python JRPG")
         pygame.font.init()
         print("Display initialized")
@@ -28,12 +28,12 @@ class Game:
     def reset_game(self):
         print("Resetting game state...")
         self.game_state = GameState()
-        self.player = Player(400, 300)
+        self.player = Player(640, 512)  # Center of 1280x1024
         self.quest_manager = QuestManager()
         self.rooms = {
-            'town': Room('town', (800, 600)),
-            'shop': Room('shop', (800, 600)),
-            'dungeon': Room('dungeon', (800, 600))
+            'town': Room('town', (1280, 1024)),
+            'shop': Room('shop', (1280, 1024)),
+            'dungeon': Room('dungeon', (1280, 1024))
         }
         self.current_room = 'town'
         print("Game reset completed")
@@ -116,7 +116,7 @@ class Game:
                 print(f"Room transition: {previous_room} -> {new_room}")
                 print(f"Spawn position: ({spawn_x}, {spawn_y})")
             except AttributeError:
-                spawn_x, spawn_y = 400, 300 #Default Spawn
+                spawn_x, spawn_y = 640, 512  # Default spawn at center of 1280x1024
                 print(f"Warning: Using default spawn position for {new_room}")
 
             # Reset player position to the appropriate spawn point
@@ -149,11 +149,11 @@ class Game:
         pygame.display.flip()
 
     def render_quest_log(self):
-        quest_surface = pygame.Surface((400, 300))
+        quest_surface = pygame.Surface((600, 500))  # Larger quest log
         quest_surface.fill((40, 40, 60))
-        pygame.draw.rect(quest_surface, (80, 80, 100), (0, 0, 400, 300), 2)
+        pygame.draw.rect(quest_surface, (80, 80, 100), (0, 0, 600, 500), 2)
 
-        font = pygame.font.Font(None, 28)
+        font = pygame.font.Font(None, 32)  # Slightly larger font
         y_offset = 20
 
         # Render active quests
@@ -162,13 +162,13 @@ class Game:
             # Quest name
             text = font.render(f"{quest.name}", True, (255, 255, 255))
             quest_surface.blit(text, (20, y_offset))
-            y_offset += 30
+            y_offset += 35
 
             # Quest description
-            font_small = pygame.font.Font(None, 24)
+            font_small = pygame.font.Font(None, 28)
             text = font_small.render(f"{quest.description}", True, (200, 200, 200))
             quest_surface.blit(text, (30, y_offset))
-            y_offset += 25
+            y_offset += 30
 
             # Objectives
             for objective in quest.objectives:
@@ -176,11 +176,12 @@ class Game:
                 text = font_small.render(f"{status} {objective['description']}", True, 
                                        (100, 255, 100) if objective['completed'] else (200, 200, 200))
                 quest_surface.blit(text, (40, y_offset))
-                y_offset += 20
+                y_offset += 25
 
-            y_offset += 10
+            y_offset += 15
 
-        self.screen.blit(quest_surface, (200, 150))
+        # Center the quest log on screen
+        self.screen.blit(quest_surface, (340, 262))  # Centered position for 1280x1024
 
     def run(self):
         running = True

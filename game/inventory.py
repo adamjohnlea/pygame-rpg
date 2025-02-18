@@ -57,5 +57,7 @@ class Inventory:
             
             y_offset += 30
 
-        # Draw inventory at center of screen
-        screen.blit(inventory_surface, (200, 150))
+        # Center the inventory on screen (1280x1024)
+        inventory_x = (1280 - inventory_surface.get_width()) // 2
+        inventory_y = (1024 - inventory_surface.get_height()) // 2
+        screen.blit(inventory_surface, (inventory_x, inventory_y))

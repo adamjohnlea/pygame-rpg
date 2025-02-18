@@ -29,17 +29,18 @@ class Combat:
 
     def render(self, screen):
         # Draw combat interface
-        combat_surface = pygame.Surface((600, 400))
+        combat_surface = pygame.Surface((1200, 800))  # Larger combat surface for 1080p
         combat_surface.fill((40, 40, 40))
         
-        # Draw health bars
-        pygame.draw.rect(combat_surface, (255, 0, 0), (50, 50, 200 * (self.player.stats['health'] / self.player.stats['max_health']), 20))
-        pygame.draw.rect(combat_surface, (255, 0, 0), (350, 50, 200 * (self.enemy['health'] / self.enemy['max_health']), 20))
+        # Draw health bars - made wider for 1080p
+        pygame.draw.rect(combat_surface, (255, 0, 0), (100, 100, 400 * (self.player.stats['health'] / self.player.stats['max_health']), 30))
+        pygame.draw.rect(combat_surface, (255, 0, 0), (700, 100, 400 * (self.enemy['health'] / self.enemy['max_health']), 30))
 
-        # Draw combat log
-        font = pygame.font.Font(None, 24)
-        for i, log in enumerate(self.combat_log[-5:]):
+        # Draw combat log with larger font
+        font = pygame.font.Font(None, 32)
+        for i, log in enumerate(self.combat_log[-8:]):  # Show more log entries
             text = font.render(log, True, (255, 255, 255))
-            combat_surface.blit(text, (50, 300 + i * 20))
+            combat_surface.blit(text, (100, 600 + i * 25))
 
-        screen.blit(combat_surface, (100, 100))
+        # Center the combat surface on screen
+        screen.blit(combat_surface, (360, 140))  # Centered position for 1920x1080
