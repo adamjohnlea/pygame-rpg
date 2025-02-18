@@ -25,15 +25,21 @@ class Shop:
             return False
 
         item = self.items[item_index]
+        print(f"Attempting to buy {item['name']} for {item['price']} gold. Current gold: {player.stats['gold']}")
+        
         if player.stats['gold'] >= item['price']:
             # Deduct gold first
+            old_gold = player.stats['gold']
             player.stats['gold'] -= item['price']
+            print(f"Gold deducted: {item['price']}. Old gold: {old_gold}, New gold: {player.stats['gold']}")
+            
             # Create a clean copy with only necessary data
             inventory_item = {
                 "id": item['id'],
                 "name": item['name'],
                 "effect": item['effect'].copy() if 'effect' in item else {}
             }
+            print(f"Adding item to inventory: {inventory_item}")
             player.inventory.add_item(inventory_item)
             return True
         return False
