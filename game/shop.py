@@ -3,7 +3,7 @@ import pygame
 class Shop:
     def __init__(self):
         self.items = [
-            {"id": "health_potion", "name": "Health Potion", "price": 50, "effect": {"health": 50}},
+            {"id": "health_potion", "name": "Health Potion", "price": 50, "effect": {"health": 20}},
             {"id": "iron_sword", "name": "Iron Sword", "price": 100, "effect": {"attack": 5}},
             {"id": "leather_armor", "name": "Leather Armor", "price": 80, "effect": {"defense": 3}}
         ]
