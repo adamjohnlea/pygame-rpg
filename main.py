@@ -232,7 +232,7 @@ class Game:
 
             # Objectives
             for objective in quest.objectives:
-                status = "✓" if objective['completed'] else "○"
+                status = "[X]" if objective['completed'] else "[ ]"  # Using standard ASCII characters
                 text = font_small.render(f"{status} {objective['description']}", True, 
                                        (100, 255, 100) if objective['completed'] else (200, 200, 200))
                 quest_surface.blit(text, (40, y_offset))
