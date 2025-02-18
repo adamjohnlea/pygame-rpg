@@ -126,13 +126,31 @@ class QuestManager:
 
     def apply_rewards(self, player):
         """Apply quest rewards and return a list of reward messages"""
-        reward_messages = []
         for quest in self.get_completed_quests():
             if quest.status == 'completed':
+                # Create reward message
                 reward_message = f"Quest Complete: {quest.name}\nRewards: {quest.get_reward_description()}"
+                
+                # Apply gold reward
+                if 'gold' in quest.rewards:
+                    player.stats['gold'] += quest.rewards['gold']
+                    print(f"Applied gold reward: +{quest.rewards['gold']}")  # Debug print
+                
+                # Apply item rewards
+                if 'items' in quest.rewards:
+                    for item in quest.rewards['items']:
+                        player.inventory.add_item(item)
+                
+                # Apply stat rewards
+                if 'stats' in quest.rewards:
+                    for stat, value in quest.rewards['stats'].items():
+                        if stat in player.stats:
+                            player.stats[stat] += value
+                
+                # Add message to pending rewards
+                print(f"Adding reward message: {reward_message}")  # Debug print
                 self.pending_rewards.append(reward_message)
                 quest.status = 'rewarded'
-        return reward_messages
 
     def has_pending_rewards(self):
         return len(self.pending_rewards) > 0
