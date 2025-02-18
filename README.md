@@ -29,8 +29,8 @@ cd simple-rpg</code></pre>
     </li>
     <li>Activate the virtual environment:
         <pre><code>On macOS/Linux:
-source venv/bin/activate</code></pre></li>
-</li><pre><code>
+source venv/bin/activate</li>
+<li><pre><code>
 On Windows:
 .\venv\Scripts\activate</code></pre>
     </li>
