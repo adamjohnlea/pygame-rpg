@@ -10,9 +10,22 @@ class Room:
         self.shop = None
         # Center the shop interaction area horizontally (1280/2 - width/2)
         self.interaction_area = pygame.Rect(490, 412, 300, 200)
+        
+        # Initialize room-specific elements
         if room_type == 'shop':
             from .shop import Shop
             self.shop = Shop()
+        elif room_type == 'dungeon':
+            self.enemy = {
+                'health': 100,
+                'max_health': 100,
+                'attack': 8,
+                'defense': 3,
+                'name': 'Dungeon Slime'
+            }
+            # Create enemy interaction area in center of dungeon
+            self.enemy_area = pygame.Rect(540, 412, 200, 200)
+            self.enemy_active = True  # Track if enemy is alive
 
     def setup_exits(self):
         """Setup exit rectangles for each room. Exits are 80 pixels wide and 160 pixels tall."""
@@ -72,6 +85,11 @@ class Room:
     def can_interact_with_shop(self, player):
         return self.room_type == 'shop' and player.rect.colliderect(self.interaction_area)
 
+    def can_interact_with_enemy(self, player):
+        return (self.room_type == 'dungeon' and 
+                self.enemy_active and 
+                player.rect.colliderect(self.enemy_area))
+
     def render(self, screen):
         # Draw background
         if self.room_type == 'town':
@@ -95,3 +113,17 @@ class Room:
                 text = font.render("Press E to interact", True, (255, 255, 255))
                 screen.blit(text, (self.interaction_area.centerx - text.get_width() // 2, 
                                 self.interaction_area.centery))
+
+        # Draw enemy and interaction prompt in dungeon
+        if self.room_type == 'dungeon' and self.enemy_active:
+            # Draw enemy area
+            pygame.draw.rect(screen, (200, 50, 50), self.enemy_area, 2)
+            # Draw enemy (simple rectangle for now)
+            pygame.draw.rect(screen, (200, 50, 50), 
+                           (self.enemy_area.centerx - 20, self.enemy_area.centery - 20, 40, 40))
+            
+            # Draw interaction prompt when player is near
+            font = pygame.font.Font(None, 24)
+            text = font.render("Press E to fight", True, (255, 255, 255))
+            screen.blit(text, (self.enemy_area.centerx - text.get_width() // 2,
+                             self.enemy_area.centery - 50))
