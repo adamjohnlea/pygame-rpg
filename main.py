@@ -43,6 +43,12 @@ class Game:
             if event.type == pygame.QUIT:
                 return False
 
+            # Handle notification dismissal first
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                if self.quest_ui.current_notification:
+                    self.quest_ui.current_notification = None
+                    continue
+
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.game_state.toggle_menu()
@@ -50,27 +56,34 @@ class Game:
                     self.game_state.toggle_inventory()
                 if event.key == pygame.K_q:
                     self.game_state.toggle_quest_log()
-                if event.key == pygame.K_j:  # New key for available quests
-                    self.game_state.toggle_available_quests()
+                if event.key == pygame.K_j:  # Available quests
+                    available_quests = self.quest_manager.get_available_quests()
+                    if available_quests:
+                        self.game_state.toggle_available_quests()
+                    else:
+                        self.quest_ui.show_notification("No quests available!\nComplete current quests to unlock more.")
                 if event.key == pygame.K_r:
                     self.reset_game()
                 if event.key == pygame.K_e and self.current_room == 'shop':
                     current_room = self.rooms[self.current_room]
                     if current_room.can_interact_with_shop(self.player):
                         self.game_state.toggle_shop()
-                if event.key == pygame.K_RETURN and self.game_state.is_available_quests_active():
-                    # Accept the first available quest
-                    available_quests = self.quest_manager.get_available_quests()
-                    if available_quests:
-                        quest = available_quests[0]
-                        if self.quest_manager.accept_quest(quest.id):
-                            self.quest_ui.show_notification(f"Accepted Quest: {quest.name}")
-                            self.game_state.toggle_available_quests()
+
+            # Handle available quests input
+            if self.game_state.is_available_quests_active():
+                selected_quest = self.quest_ui.handle_input(event, self.quest_manager.get_available_quests())
+                if selected_quest:
+                    if self.quest_manager.accept_quest(selected_quest.id):
+                        self.quest_ui.show_notification(f"Accepted Quest: {selected_quest.name}")
+                        self.game_state.toggle_available_quests()
 
             # Handle shop input when shop is active
             if self.game_state.is_shop_active() and self.current_room == 'shop':
-                if self.rooms['shop'].shop.handle_input(event, self.player):
+                success, message = self.rooms['shop'].shop.handle_input(event, self.player)
+                if success:
                     self.quest_manager.check_purchase_objectives(None)
+                elif message:  # If there's a message (like insufficient gold)
+                    self.quest_ui.show_notification(message)
 
             self.player.handle_input(event)
 
@@ -88,9 +101,6 @@ class Game:
                 reward_message = self.quest_manager.get_next_reward_message()
                 if reward_message:
                     self.quest_ui.show_notification(reward_message)
-
-        # Update quest UI
-        self.quest_ui.update()
 
     def check_room_transition(self):
         current_room = self.rooms[self.current_room]
