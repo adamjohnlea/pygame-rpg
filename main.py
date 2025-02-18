@@ -6,40 +6,30 @@ from game.menu import Menu
 from game.player import Player
 from game.room import Room
 from game.quest import QuestManager
-from game.hud import HUD  # Add import for HUD
+from game.quest_ui import QuestUI
+from game.hud import HUD
 
 class Game:
     def __init__(self):
         print("Initializing game...")
         self.screen = pygame.display.set_mode((800, 600))
         pygame.display.set_caption("Python JRPG")
-        pygame.font.init()  # Initialize font system
+        pygame.font.init()
         print("Display initialized")
 
         self.clock = pygame.time.Clock()
         self.game_state = GameState()
         self.menu = Menu(self.screen)
-        self.hud = HUD()  # Initialize HUD
+        self.hud = HUD()
+        self.quest_ui = QuestUI()
         print("Game components initialized")
         self.reset_game()
 
     def reset_game(self):
         print("Resetting game state...")
-        # Reset game state
         self.game_state = GameState()
-
-        # Create new player
-        print("Creating player...")
         self.player = Player(400, 300)
-        print(f"Player initialized at position: ({self.player.x}, {self.player.y})")
-        print(f"Player rect: {self.player.rect}")
-
-        # Reset quest manager and start tutorial quest
         self.quest_manager = QuestManager()
-        self.quest_manager.start_quest("tutorial_quest")
-
-        # Initialize rooms
-        print("Initializing rooms...")
         self.rooms = {
             'town': Room('town', (800, 600)),
             'shop': Room('shop', (800, 600)),
@@ -60,52 +50,47 @@ class Game:
                     self.game_state.toggle_inventory()
                 if event.key == pygame.K_q:
                     self.game_state.toggle_quest_log()
+                if event.key == pygame.K_j:  # New key for available quests
+                    self.game_state.toggle_available_quests()
                 if event.key == pygame.K_r:
                     self.reset_game()
                 if event.key == pygame.K_e and self.current_room == 'shop':
                     current_room = self.rooms[self.current_room]
                     if current_room.can_interact_with_shop(self.player):
                         self.game_state.toggle_shop()
+                if event.key == pygame.K_RETURN and self.game_state.is_available_quests_active():
+                    # Accept the first available quest
+                    available_quests = self.quest_manager.get_available_quests()
+                    if available_quests:
+                        quest = available_quests[0]
+                        if self.quest_manager.accept_quest(quest.id):
+                            self.quest_ui.show_notification(f"Accepted Quest: {quest.name}")
+                            self.game_state.toggle_available_quests()
 
             # Handle shop input when shop is active
             if self.game_state.is_shop_active() and self.current_room == 'shop':
                 if self.rooms['shop'].shop.handle_input(event, self.player):
-                    # If item was bought, check quest objectives
                     self.quest_manager.check_purchase_objectives(None)
-                    # Don't apply rewards immediately - they'll be applied in update()
-                    # self.apply_quest_rewards()  # Removed from here
 
             self.player.handle_input(event)
 
         return True
 
-    def apply_quest_rewards(self):
-        for quest in self.quest_manager.get_active_quests():
-            if quest.is_completed() and quest.status != 'rewarded':
-                print(f"Applying rewards for quest: {quest.name}")  # Debug print
-                # Apply rewards
-                if 'gold' in quest.rewards:
-                    reward_gold = quest.rewards['gold']
-                    print(f"Adding {reward_gold} gold as quest reward")  # Debug print
-                    self.player.stats['gold'] += reward_gold
-                if 'items' in quest.rewards:
-                    for item in quest.rewards['items']:
-                        for _ in range(item.get('quantity', 1)):
-                            self.player.inventory.add_item({'id': item['id']})
-                if 'stats' in quest.rewards:
-                    for stat, value in quest.rewards['stats'].items():
-                        self.player.stats[stat] += value
-                quest.status = 'rewarded'
-                print(f"Quest {quest.name} marked as rewarded")
-
     def update(self):
         if not self.game_state.is_menu_active() and not self.game_state.is_shop_active():
             self.player.update()
             self.check_room_transition()
-            # Update quest objectives based on current room
             self.quest_manager.check_room_objectives(self.current_room)
-            # Check and apply any completed quest rewards
-            self.apply_quest_rewards()
+            
+            # Apply quest rewards and show notifications
+            self.quest_manager.apply_rewards(self.player)
+            if self.quest_manager.has_pending_rewards():
+                reward_message = self.quest_manager.get_next_reward_message()
+                if reward_message:
+                    self.quest_ui.show_notification(reward_message)
+
+        # Update quest UI
+        self.quest_ui.update()
 
     def check_room_transition(self):
         current_room = self.rooms[self.current_room]
@@ -129,19 +114,14 @@ class Game:
 
     def render(self):
         self.screen.fill((0, 0, 0))
-
-        # Render current room
         self.rooms[self.current_room].render(self.screen)
-
-        # Render player
+        
         if not self.game_state.is_shop_active():
             self.player.render(self.screen)
 
-        # Update and render HUD
         self.hud.update(self.player.stats)
         self.hud.render(self.screen, self.player.stats, self.current_room)
 
-        # Render UI elements
         if self.game_state.is_menu_active():
             self.menu.render()
         if self.game_state.is_inventory_active():
@@ -150,6 +130,11 @@ class Game:
             self.rooms['shop'].shop.render(self.screen)
         if self.game_state.is_quest_log_active():
             self.render_quest_log()
+        if self.game_state.is_available_quests_active():
+            self.quest_ui.render_available_quests(self.screen, self.quest_manager.get_available_quests())
+
+        # Render any active notifications
+        self.quest_ui.render_notification(self.screen)
 
         pygame.display.flip()
 

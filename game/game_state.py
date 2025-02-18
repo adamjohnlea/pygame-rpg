@@ -6,6 +6,7 @@ class GameState:
         self.combat_active = False
         self.current_state = "game"
         self.quest_log_active = False
+        self.available_quests_active = False
 
     def toggle_menu(self):
         self.menu_active = not self.menu_active
@@ -42,6 +43,9 @@ class GameState:
         else:
             self.current_state = "game"
 
+    def toggle_available_quests(self):
+        self.available_quests_active = not self.available_quests_active
+
     def is_menu_active(self):
         return self.menu_active
 
@@ -56,3 +60,6 @@ class GameState:
 
     def is_quest_log_active(self):
         return self.quest_log_active
+
+    def is_available_quests_active(self):
+        return self.available_quests_active
