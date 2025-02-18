@@ -26,8 +26,15 @@ class Shop:
 
         item = self.items[item_index]
         if player.stats['gold'] >= item['price']:
+            # Deduct gold first
             player.stats['gold'] -= item['price']
-            player.inventory.add_item(item.copy())
+            # Create a clean copy with only necessary data
+            inventory_item = {
+                "id": item['id'],
+                "name": item['name'],
+                "effect": item['effect'].copy() if 'effect' in item else {}
+            }
+            player.inventory.add_item(inventory_item)
             return True
         return False
 
