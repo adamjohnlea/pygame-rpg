@@ -2,46 +2,66 @@ import pygame
 
 class QuestUI:
     def __init__(self):
-        self.notification_time = 0
-        self.notification_duration = 3000  # 3 seconds
         self.current_notification = None
         self.font = pygame.font.Font(None, 28)
         self.small_font = pygame.font.Font(None, 24)
+        self.selected_quest_index = 0  # Track selected quest
 
     def show_notification(self, message):
         self.current_notification = message
-        self.notification_time = pygame.time.get_ticks()
 
-    def update(self):
-        if self.current_notification:
-            if pygame.time.get_ticks() - self.notification_time > self.notification_duration:
+    def handle_input(self, event, quests):
+        if not quests:
+            return None
+            
+        if event.type == pygame.KEYDOWN:
+            # Handle notification dismissal
+            if event.key == pygame.K_SPACE and self.current_notification:
                 self.current_notification = None
+                return None
+                
+            # Handle quest selection
+            if event.key == pygame.K_UP:
+                self.selected_quest_index = (self.selected_quest_index - 1) % len(quests)
+            elif event.key == pygame.K_DOWN:
+                self.selected_quest_index = (self.selected_quest_index + 1) % len(quests)
+            elif event.key == pygame.K_RETURN:
+                return quests[self.selected_quest_index]
+        return None
 
     def render_notification(self, screen):
         if self.current_notification:
-            # Create notification surface
+            # Create notification surface with alpha channel
             lines = self.current_notification.split('\n')
             line_height = 30
-            height = (len(lines) + 1) * line_height
-            notif_surface = pygame.Surface((600, height))
-            notif_surface.fill((40, 40, 60))
-            pygame.draw.rect(notif_surface, (80, 80, 100), (0, 0, 600, height), 2)
+            height = (len(lines) + 1) * line_height + 20  # Extra space for dismiss instruction
+            notif_surface = pygame.Surface((600, height), pygame.SRCALPHA)
+            
+            # Fill with semi-transparent background
+            pygame.draw.rect(notif_surface, (40, 40, 60, 230), (0, 0, 600, height))
+            pygame.draw.rect(notif_surface, (80, 80, 100, 255), (0, 0, 600, height), 2)
 
             # Render each line
-            for i, line in enumerate(lines):
-                text = self.font.render(line, True, (255, 255, 255))
-                notif_surface.blit(text, (20, i * line_height + 10))
+            y_offset = 10
+            for line in lines:
+                # Create text surface
+                text = self.font.render(line.strip(), True, (255, 255, 255))
+                # Center text
+                text_rect = text.get_rect(centerx=300, y=y_offset)
+                notif_surface.blit(text, text_rect)
+                y_offset += line_height
 
-            # Add fade effect based on time
-            alpha = 255
-            time_shown = pygame.time.get_ticks() - self.notification_time
-            if time_shown > self.notification_duration - 500:  # Start fading 0.5s before end
-                alpha = max(0, 255 * (self.notification_duration - time_shown) / 500)
-            notif_surface.set_alpha(alpha)
+            # Add dismiss instruction
+            dismiss_text = self.small_font.render("Press SPACE to dismiss", True, (200, 200, 200))
+            dismiss_rect = dismiss_text.get_rect(centerx=300, y=y_offset)
+            notif_surface.blit(dismiss_text, dismiss_rect)
 
             # Position at top center of screen
             x = (screen.get_width() - notif_surface.get_width()) // 2
             screen.blit(notif_surface, (x, 20))
+            
+            # Debug print
+            print(f"Rendering notification: {self.current_notification}")
 
     def render_available_quests(self, screen, quests):
         if not quests:
@@ -56,9 +76,17 @@ class QuestUI:
         title = self.font.render("Available Quests", True, (255, 255, 255))
         quest_surface.blit(title, (20, 20))
 
+        # Instructions
+        instructions = self.small_font.render("Use ↑↓ to select, ENTER to accept", True, (200, 200, 200))
+        quest_surface.blit(instructions, (20, 45))
+
         # Render each quest
-        y_offset = 60
-        for quest in quests:
+        y_offset = 80
+        for i, quest in enumerate(quests):
+            # Highlight selected quest
+            if i == self.selected_quest_index:
+                pygame.draw.rect(quest_surface, (60, 60, 80), (10, y_offset - 5, 380, 65))
+                
             # Quest name
             name_text = self.font.render(quest.name, True, (200, 200, 255))
             quest_surface.blit(name_text, (20, y_offset))
