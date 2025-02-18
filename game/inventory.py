@@ -67,7 +67,7 @@ class Inventory:
         pygame.draw.rect(inventory_surface, (100, 100, 100), (0, 0, 400, 300), 2)
 
         # Draw title
-        title = self.font.render("Inventory (↑↓ to select, Enter to use)", True, (255, 255, 255))
+        title = self.font.render("Inventory (UP/DOWN to select, Enter to use)", True, (255, 255, 255))
         inventory_surface.blit(title, (20, 20))
         y_offset = 50
 

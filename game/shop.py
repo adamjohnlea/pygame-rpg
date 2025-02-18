@@ -63,7 +63,7 @@ class Shop:
             shop_surface.blit(text, (20, y_pos))
 
         # Draw instructions
-        instructions = font.render("↑↓: Select item, Enter: Buy", True, (200, 200, 200))
+        instructions = font.render("UP/DOWN: Select item, Enter: Buy", True, (200, 200, 200))
         shop_surface.blit(instructions, (20, 250))
 
         # Center the shop menu on screen
