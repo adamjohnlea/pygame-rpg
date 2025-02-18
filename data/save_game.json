@@ -1,0 +1,44 @@
+{
+    "player": {
+        "stats": {
+            "health": 100,
+            "max_health": 100,
+            "attack": 10,
+            "defense": 5,
+            "gold": 100
+        },
+        "position": {
+            "x": 400,
+            "y": 300,
+            "current_room": "town"
+        },
+        "inventory": []
+    },
+    "game_state": {
+        "visited_rooms": ["town"],
+        "completed_quests": [],
+        "shop_inventory": [
+            {
+                "name": "Health Potion",
+                "price": 50,
+                "effect": {
+                    "health": 50
+                }
+            },
+            {
+                "name": "Iron Sword",
+                "price": 100,
+                "effect": {
+                    "attack": 5
+                }
+            },
+            {
+                "name": "Leather Armor",
+                "price": 80,
+                "effect": {
+                    "defense": 3
+                }
+            }
+        ]
+    }
+}

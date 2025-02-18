@@ -1,0 +1,63 @@
+{
+    "quests": [
+        {
+            "id": "tutorial_quest",
+            "name": "Welcome to Town",
+            "description": "Learn the basics of the game",
+            "objectives": [
+                {
+                    "id": "visit_shop",
+                    "description": "Visit the town shop",
+                    "type": "visit_room",
+                    "target": "shop",
+                    "completed": false
+                },
+                {
+                    "id": "buy_item",
+                    "description": "Buy any item from the shop",
+                    "type": "purchase",
+                    "completed": false
+                }
+            ],
+            "rewards": {
+                "gold": 50,
+                "items": [
+                    {
+                        "id": "health_potion",
+                        "quantity": 1
+                    }
+                ]
+            },
+            "status": "not_started"
+        },
+        {
+            "id": "warrior_path",
+            "name": "Path of the Warrior",
+            "description": "Prove yourself as a warrior",
+            "objectives": [
+                {
+                    "id": "get_sword",
+                    "description": "Acquire an Iron Sword",
+                    "type": "acquire_item",
+                    "target": "iron_sword",
+                    "completed": false
+                },
+                {
+                    "id": "get_armor",
+                    "description": "Acquire Leather Armor",
+                    "type": "acquire_item",
+                    "target": "leather_armor",
+                    "completed": false
+                }
+            ],
+            "rewards": {
+                "gold": 100,
+                "stats": {
+                    "attack": 2,
+                    "defense": 2
+                }
+            },
+            "status": "not_started"
+        }
+    ]
+}

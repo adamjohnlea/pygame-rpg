@@ -1,0 +1,34 @@
+{
+    "items": [
+        {
+            "id": "health_potion",
+            "name": "Health Potion",
+            "type": "consumable",
+            "effect": {
+                "health": 50
+            },
+            "price": 50,
+            "description": "Restores 50 HP"
+        },
+        {
+            "id": "iron_sword",
+            "name": "Iron Sword",
+            "type": "weapon",
+            "effect": {
+                "attack": 5
+            },
+            "price": 100,
+            "description": "A basic sword"
+        },
+        {
+            "id": "leather_armor",
+            "name": "Leather Armor",
+            "type": "armor",
+            "effect": {
+                "defense": 3
+            },
+            "price": 80,
+            "description": "Basic protective gear"
+        }
+    ]
+}
