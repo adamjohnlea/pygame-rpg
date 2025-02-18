@@ -91,3 +91,5 @@ coverage.xml
 saves/
 *.save
 *.bak 
+
+.cursorrules
