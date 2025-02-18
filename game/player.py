@@ -20,6 +20,8 @@ class Player:
         self.stats = {
             "health": 100,
             "max_health": 100,
+            "stamina": 100,
+            "max_stamina": 100,
             "attack": 10,
             "defense": 5,
             "gold": 100

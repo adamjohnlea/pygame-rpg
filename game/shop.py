@@ -66,5 +66,7 @@ class Shop:
         instructions = font.render("↑↓: Select item, Enter: Buy", True, (200, 200, 200))
         shop_surface.blit(instructions, (20, 250))
 
-        # Draw shop at center of screen
-        screen.blit(shop_surface, (200, 150))
+        # Center the shop menu on screen
+        shop_x = (1280 - shop_surface.get_width()) // 2
+        shop_y = (1024 - shop_surface.get_height()) // 2
+        screen.blit(shop_surface, (shop_x, shop_y))
