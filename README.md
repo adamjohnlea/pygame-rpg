@@ -28,10 +28,10 @@ cd simple-rpg</code></pre>
         <pre><code>python3 -m venv venv</code></pre>
     </li>
     <li>Activate the virtual environment:
-        <pre><code># On macOS/Linux:
-source venv/bin/activate
-
-# On Windows:
+        <pre><code>On macOS/Linux:
+source venv/bin/activate</code></pre></li>
+</li><pre><code>
+On Windows:
 .\venv\Scripts\activate</code></pre>
     </li>
     <li>Install dependencies:
