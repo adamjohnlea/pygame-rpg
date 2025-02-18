@@ -8,6 +8,21 @@ class HUD:
         self.animation_speed = 0.1
         self.header_height = 40
         self.font = pygame.font.Font(None, 28)
+        # Gold coin colors
+        self.coin_color = (255, 215, 0)  # Golden yellow
+        self.coin_border = (218, 165, 32)  # Darker gold
+        self.coin_radius = 8
+
+    def draw_gold_coin(self, screen, x, y):
+        # Draw the main coin circle
+        pygame.draw.circle(screen, self.coin_color, (x, y), self.coin_radius)
+        # Draw border
+        pygame.draw.circle(screen, self.coin_border, (x, y), self.coin_radius, 1)
+        # Draw a simple '$' or 'G' in the middle
+        mini_font = pygame.font.Font(None, 16)
+        symbol = mini_font.render("G", True, self.coin_border)
+        symbol_rect = symbol.get_rect(center=(x, y))
+        screen.blit(symbol, symbol_rect)
 
     def update(self, player_stats):
         # Smoothly animate health changes
@@ -56,12 +71,12 @@ class HUD:
         )
         screen.blit(health_text, (170, 10))
 
-        # Draw gold with animation
-        gold_icon = "⚜"  # Unicode symbol for gold
+        # Draw custom gold coin and amount
+        self.draw_gold_coin(screen, 350, 20)  # Draw coin at y=20 to center it vertically
         gold_text = self.font.render(
-            f"{gold_icon} {int(self.animated_gold)}", True, (255, 215, 0)
+            str(int(self.animated_gold)), True, self.coin_color
         )
-        screen.blit(gold_text, (350, 10))
+        screen.blit(gold_text, (365, 10))  # Adjusted x position to account for coin
 
         # Draw room name with a background highlight
         room_text = self.font.render(current_room.capitalize(), True, (200, 200, 255))
